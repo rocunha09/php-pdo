@@ -29,7 +29,7 @@
 
             // inserindo registros no db
             /*
-            $sql='insert into tb_users( nome, email, senha) values("nique", "nique@teste.com.br", "654321")';
+            $sql='insert into tb_users( nome, email, senha) values("joaquin", "joaquin@teste.com.br", "987654")';
 
             try {
                 $retorno = $conexao->exec($sql);
@@ -115,19 +115,25 @@
             //consultando banco procurando o valor recebido por POST
             //testando SQL injection através do campo senha com a instrução abaixo inserida após a senha digitada
             //'; delete from tb_users where 'a' = 'a
+            
             $sql="select * from tb_users where"; 
-            $sql .= " email ='{$_POST['usuario']}'";
-            $sql .= " and senha ='{$_POST['senha']}'";
-
+            $sql .= " email = :usuario";
+            $sql .= " and senha = :senha";
             echo $sql;
             
-            $stmt = $conexao->query($sql);
+            //usando prepare statement, e bindValue para tratar os dados antes de executar a query no banco, evitando assim Injections...
+            $stmt = $conexao->prepare($sql);
+            $stmt->bindValue(':usuario', $_POST['usuario']); 
+            //o bindValue pode ainda receber um terceiro parâmetro indicando o tipo de dado que ele deve considerar, desconsiderando todo resto exemplo:
+            $stmt->bindValue(':senha', $_POST['senha'], PDO::PARAM_INT);
+            $stmt->execute();
+            
             $usuario = $stmt->fetch();
 
             echo '<pre>';
             print_r($usuario);
             echo '</pre>';
-
+            
         } catch (PDOException $e) {
             echo '<p>falha na conexão</p>';
             echo '<p>Erro:'.$e->getCode().'</p>';
