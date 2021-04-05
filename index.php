@@ -25,7 +25,7 @@
         */
 
         // inserindo registros no db
-
+        /*
         $sql='insert into tb_users( nome, email, senha) values("nique", "nique@teste.com.br", "654321")';
 
         try {
@@ -33,6 +33,20 @@
             echo '<p>registro inserido com sucesso</p>';
         } catch (PDOException $e) {
             echo '<p>falha ao realizar registro</p>';
+            echo '<p>Erro:'.$e->getCode().'</p>';
+            echo '<p>Mensagem:'.$e->getMessage().'</p>';
+        }
+        */
+
+        // deletando registros no db
+        
+        $sql='delete from tb-users where id=2';
+
+        try {
+            $retorno = $conexao->exec($sql);
+            echo '<p>registro excluído com sucesso</p>';
+        } catch (PDOException $e) {
+            echo '<p>falha ao realizar exclusão</p>';
             echo '<p>Erro:'.$e->getCode().'</p>';
             echo '<p>Mensagem:'.$e->getMessage().'</p>';
         }
