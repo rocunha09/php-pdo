@@ -1,5 +1,5 @@
 # php-pdo
-Praticando o uso: **PHP* + **PDO** + **MySql**.
+Praticando o uso: **PHP** + **PDO** + **MySql**.
 
 Realizando operações de cadastro de usuários, delete, e consultas através do objeto instanciado através da classe nativa do php: **PDO** para saber mais [clique aqui](https://www.php.net/manual/en/class.pdo).
 
