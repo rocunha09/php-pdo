@@ -39,7 +39,7 @@
         */
 
         // deletando registros no db
-        
+        /*
         $sql='delete from tb-users where id=2';
 
         try {
@@ -50,7 +50,41 @@
             echo '<p>Erro:'.$e->getCode().'</p>';
             echo '<p>Mensagem:'.$e->getMessage().'</p>';
         }
-        
+        */
+
+        //listando registros atráves de uma consulta no db
+
+        $sql='select * from tb_users';
+
+        try {
+            $stmt = $conexao->query($sql);
+            $lista = $stmt->fetchALL(PDO::FETCH_OBJ); //FETCH_NUM || FETCH_ASSOC || FETCH_BOTH || FETCH_OBJ
+
+            //FETCH_NUM 
+             //retorna o valor contido na posição [0] da lista e acesa outro array, e acessa a posição [1] referente ao nome.
+            
+             //echo $lista[0][1];
+            //FETCH_ASSOC 
+            //retorna o valor contido na posição [0] da lista e acesa outro array, e acessa o indice ['email'] referente ao email.
+            //echo $lista[0]['email']; 
+            
+            //FETCH_OBJ 
+            //retorna o valor contido na posição [0] da lista que e acesa um objeto, e acessa o atributo email deste objeto.
+            //echo $lista[0]->email;
+
+            echo '<hr>';
+            
+            foreach ($lista as $value) {
+                //print_r($value);
+                echo $value->email;
+                echo '<hr>';
+            }
+
+        } catch (PDOException $e) {
+            echo '<p>falha ao realizar consulta</p>';
+            echo '<p>Erro:'.$e->getCode().'</p>';
+            echo '<p>Mensagem:'.$e->getMessage().'</p>';
+        }
 
     } catch (PDOException $e) {
         echo '<p>falha na conexão</p>';
