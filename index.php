@@ -53,7 +53,7 @@
         */
 
         //listando registros atráves de uma consulta no db
-
+        /*
         $sql='select * from tb_users';
 
         try {
@@ -85,7 +85,29 @@
             echo '<p>Erro:'.$e->getCode().'</p>';
             echo '<p>Mensagem:'.$e->getMessage().'</p>';
         }
+        */
 
+        // consultando apenas 1 registro no db
+        
+        $id = 3;
+        $sql='select * from tb_users where id =' .$id;
+
+        try {
+            $stmt = $conexao->query($sql);
+            $user = $stmt->fetch(PDO::FETCH_OBJ);
+            echo '<pre>';
+            print_r($user);
+            echo '</pre>';
+
+            echo $user->email;
+            echo '<hr>';
+
+        } catch (PDOException $e) {
+            echo '<p>falha ao realizar consulta</p>';
+            echo '<p>Erro:'.$e->getCode().'</p>';
+            echo '<p>Mensagem:'.$e->getMessage().'</p>';
+        }
+    
     } catch (PDOException $e) {
         echo '<p>falha na conexão</p>';
         echo '<p>Erro:'.$e->getCode().'</p>';
