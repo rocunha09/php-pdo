@@ -107,7 +107,52 @@ class Usuario
 
     public function deletar()
     {
+        $sql="select count(*) as status from tb_users where id = :id";
 
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(":id", $this->__get("id"));
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        
+        if($result['status'] == 0){
+            $status = array(
+                'status' => 0,
+                'Menssagem' => "Erro ao deletar dados.",
+                'stmt errorinfo' => $stmt->errorInfo()
+            );
+            $result = json_encode($status, true);
+
+            return $result;
+
+        }
+
+        $sql="delete from tb_users where id = :id";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(":id", $this->__get("id"));
+        $result = $stmt->execute();
+
+        if($result){
+            $status = array(
+                'status' => 1,
+                'Menssagem' => "Dados  referente ao id: {$this->__get("id")} deletados com sucesso.",
+            );
+            $result = json_encode($status, true);
+
+            return $result;
+
+        } else {
+            $status = array(
+                'status' => 0,
+                'Menssagem' => "Erro ao deletar dados.",
+                'stmt errorinfo' => $stmt->errorInfo()
+            );
+            $result = json_encode($status, true);
+
+        }
+        return $result;
+ 
     }
 
     public function listar()

@@ -25,14 +25,14 @@
         $usuario->visualizar(); //consulta: nome, email, senha, no id definido
     */
 
-    $usuario->__set("nome", "Jorge");
-    $usuario->__set("email", "jorge@teste.com.br");
-    $usuario->__set("senha", "123456");
-    //$usuario->__set("id", "3");
+    //$usuario->__set("nome", "Jorge");
+    //$usuario->__set("email", "jorge@teste.com.br");
+    //$usuario->__set("senha", "123456");
+    $usuario->__set("id", "5");
 
 
 
-    print_r($usuario->listar());
+    print_r($usuario->deletar());
 
     
 ?>
