@@ -112,6 +112,34 @@ class Usuario
 
     public function listar()
     {
+        $sql="select id, nome, email, senha from tb_users";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if(!$result){
+            $status = array(
+                'status' => 0,
+                'Menssagem' => "Erro - Dados não encontrados.",
+                'stmt errorinfo' => $stmt->errorInfo()
+            );
+            $result = json_encode($status, true);
+
+            return $result;
+
+        }
+
+        $status = array(
+            'status' => 1,
+            'message' => "Dados encontrados com sucesso.",
+        );
+
+        $status = array_merge($result, $status);
+
+        $result = json_encode($status, true);
+
+        return $result;
 
     }
 
