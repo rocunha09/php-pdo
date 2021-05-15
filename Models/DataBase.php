@@ -16,10 +16,16 @@ class DataBase
         $this->db = $db;
         $this->user = $user;
         $this->password = $password;
-        
+        $this->conectar();
+
+        return $this;
     }
 
-    public function conectar(){
+    public function getDb(){
+        return $this->conn;
+    }
+
+    private function conectar(){
         try {
             $conexao = new PDO("mysql:hostname=" . $this->host . "; port=" . $this->port . ";dbname=" . $this->db, $this->user, $this->password);
             $this->conn = $conexao;
@@ -41,11 +47,11 @@ class DataBase
         return $result;
     }
 
-
+     //criar tabela
     public function create($entidade, $campos = array()){
         $camposLength = count($campos);
         
-        $sql="CREATE TABLE $entidade(";
+        $sql="CREATE TABLE IF NOT EXISTS $entidade(";
         for($i = 0; $i < $camposLength; $i++){
             $sql .= $campos[$i] . ", ";
         }
