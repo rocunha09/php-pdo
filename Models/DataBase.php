@@ -1,50 +1,40 @@
 <?php
 
-class DataBase 
+class DataBase extends PDO
 {
-    private $host;
-    private $port;
-    private $db;
-    private $user;
-    private $password;
+    private $host = "localhost";
+    private $port = 3307;
+    private $db = "db_pdo";
+    private $user = "root";
+    private $password = "";
     private $conn;
 
-
-    public function __construct($host, $port, $db, $user, $password){
-        $this->host = $host;
-        $this->port = $port;
-        $this->db = $db;
-        $this->user = $user;
-        $this->password = $password;
-        $this->conectar();
-
-        return $this;
-    }
-
-    public function getDb(){
-        return $this->conn;
-    }
-
-    private function conectar(){
+    public function __construct(){
         try {
-            $conexao = new PDO("mysql:hostname=" . $this->host . "; port=" . $this->port . ";dbname=" . $this->db, $this->user, $this->password);
-            $this->conn = $conexao;
-            
-            $status = array(
-                'status' => "Conectado com Sucesso."
-            );
-            $result = json_encode($status, true);
-
+            $this->conn = new PDO("mysql:hostname=" . $this->host . "; port=" . $this->port . ";dbname=" . $this->db, $this->user, $this->password);
+        
         } catch (PDOException $e) {
             $status = array(
                 "status" => "Erro.",
                 "Codigo" => $e->getCode(),
                 "Mensagem" => $e->getMessage()
             );
-            $result = json_encode($status, true);
+            
+            $this->conn = json_encode($status, true);
         }
 
-        return $result;
+        return $this->conn;
+
+    }
+
+    public function __get($attr)
+    {
+        return $this->$attr;
+    }
+
+    public function __set($attr, $val)
+    {
+        $this->$attr = $val;
     }
 
      //criar tabela
@@ -61,6 +51,35 @@ class DataBase
         $result =  $this->conn->exec($sql);
         return $result;
 
+    }
+
+    private function setParams($statement, $parameters = array()){
+
+        foreach ($parameters as $key => $value) {
+            $this->setParam($key, $value);
+
+        }
+
+    }
+
+    private function setParam($statement, $key, $value){
+        $statement->bindparam($key, $value);
+
+    }
+
+    public function query($rawQuery, $params = array()){
+        $stmt = $this->conn->prepare($rawQuery);
+
+        $this->setParams($stmt, $params);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    public function select($rawQuery, $params = array()):array{
+        $stmt = $this->query($rawQuery, $params);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $result;
     }
 }
 
