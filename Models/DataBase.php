@@ -3,7 +3,7 @@
 class DataBase extends PDO
 {
     private $host = "localhost";
-    private $port = 3306;
+    private $port = 3307;
     private $db = "php-pdo";
     private $user = "root";
     private $password = "";
@@ -12,10 +12,10 @@ class DataBase extends PDO
     public function __construct(){
         try {
             $this->conn = new PDO("mysql:hostname=" . $this->host . "; port=" . $this->port . ";dbname=" . $this->db, $this->user, $this->password);
-        
+           
         } catch (PDOException $e) {
             $status = array(
-                "status" => "Erro.",
+                "status" => "Erro",
                 "Codigo" => $e->getCode(),
                 "Mensagem" => $e->getMessage()
             );
@@ -37,7 +37,8 @@ class DataBase extends PDO
         $this->$attr = $val;
     }
 
-    private function setParams($statement, $parameters = array()){
+    private function setParams($statement, $parameters = array())
+    {
 
         foreach ($parameters as $key => $value) {
             $this->setParam($statement, $key, $value);
@@ -46,25 +47,29 @@ class DataBase extends PDO
 
     }
 
-    private function setParam($statement, $key, $value){
+    private function setParam($statement, $key, $value)
+    {
         $statement->bindparam($key, $value);
 
     }
 
-    public function query($rawQuery, $params = array()){
+    public function query($rawQuery, $params = array())
+    {
         $stmt = $this->conn->prepare($rawQuery);
-
         $this->setParams($stmt, $params);
         $stmt->execute();
         return $stmt;
+       
     }
 
-    public function select($rawQuery, $params = array()):array{
+    public function select($rawQuery, $params = array()):array
+    {
         $stmt = $this->query($rawQuery, $params);
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+        
         return $result;
     }
+
 }
 
 ?>

@@ -19,17 +19,23 @@ class Usuario
         $this->$attr = $val;
     }
 
-    public function inserir()
+    public function inserir($nome, $email, $senha)
     {
-        $sql="insert into tb_users( nome, email, senha) values (:nome, :email, :senha)";
+        $this->__set("nome", $nome);
+        $this->__set("email", $email);
+        $this->__set("senha", $senha);
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(":nome", $this->__get("nome"));
-        $stmt->bindValue(":email", $this->__get("email"));
-        $stmt->bindValue(":senha", $this->__get("senha"));
-        $result = $stmt->execute();
+        $sql = new DataBase();
+        
+        $result = $sql->query("insert into tb_users( nome, email, senha) values (:nome, :email, :senha)", array(
+            ":nome" => $this->__get("nome"),
+            ":email" => $this->__get("email"),
+            ":senha" => $this->__get("senha")
+        ));
 
-        if($result){
+        $result = $result->errorInfo();
+
+        if($result[0] == 0){
             $status = array(
                 'status' => 1,
                 'message' => "Dados salvos com sucesso."
@@ -47,38 +53,32 @@ class Usuario
         return $result;
     }
 
-    public function atualizar()
+    public function atualizar($id, $nome, $email, $senha)
     {
-        $sql="select count(*) as status from tb_users where id = :id";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(":id", $this->__get("id"));
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $this->visualizar($id);
+        $not_find = json_decode($result, true);
         
-        
-        if($result['status'] == 0){
-            $status = array(
-                'status' => 0,
-                'Menssagem' => "Erro ao atualizar dados.",
-                'stmt errorinfo' => $stmt->errorInfo()
-            );
-            $result = json_encode($status, true);
-
+        if(!$not_find['status']){
             return $result;
-
         }
- 
-        $sql="update tb_users set nome = :nome, email = :email, senha = :senha where id = :id";
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(":nome", $this->__get("nome"));
-        $stmt->bindValue(":email", $this->__get("email"));
-        $stmt->bindValue(":senha", $this->__get("senha"));
-        $stmt->bindValue(":id", $this->__get("id"));
-        $result = $stmt->execute();
+        $this->__set("id", $id);
+        $this->__set("nome", $nome);
+        $this->__set("email", $email);
+        $this->__set("senha", $senha);
 
-        if($result){
+        $sql = new DataBase();
+        
+        $result = $sql->query("update tb_users set nome = :nome, email = :email, senha = :senha where id = :id", array(
+            ":nome" => $this->__get("nome"),
+            ":email" => $this->__get("email"),
+            ":senha" => $this->__get("senha"),
+            ":id" => $this->__get("id")
+        ));
+               
+        $result = $result->errorInfo();
+
+        if($result[0] == 0){
             $status = array(
                 'status' => 1,
                 'message' => "Dados atualizados com sucesso."
@@ -89,7 +89,7 @@ class Usuario
             $status = array(
                 'status' => 0,
                 'Menssagem' => "Erro ao atualizar dados.",
-                'stmt errorinfo' => $stmt->errorInfo()
+                'stmt errorinfo' => $result->errorInfo()
             );
             $result = json_encode($status, true);
 
@@ -98,38 +98,25 @@ class Usuario
         return $result;
     }
 
-    public function deletar()
+    public function deletar($id)
     {
-        $sql="select count(*) as status from tb_users where id = :id";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(":id", $this->__get("id"));
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $result = $this->visualizar($id);
+        $not_find = json_decode($result, true);
         
-        
-        if($result['status'] == 0){
-            $status = array(
-                'status' => 0,
-                'Menssagem' => "Erro ao deletar dados.",
-                'stmt errorinfo' => $stmt->errorInfo()
-            );
-            $result = json_encode($status, true);
-
+        if(!$not_find['status']){
             return $result;
-
         }
 
-        $sql="delete from tb_users where id = :id";
+        $sql = new DataBase();
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(":id", $this->__get("id"));
-        $result = $stmt->execute();
+        $result = $sql->query("delete from tb_users where id = :id", array(
+            ":id" => $id
+        ));
 
         if($result){
             $status = array(
                 'status' => 1,
-                'Menssagem' => "Dados  referente ao id: {$this->__get("id")} deletados com sucesso.",
+                'Menssagem' => "Dados referente ao id: {$this->__get("id")} deletados com sucesso.",
             );
             $result = json_encode($status, true);
 
@@ -145,16 +132,13 @@ class Usuario
 
         }
         return $result;
- 
+
     }
 
     public function listar()
     {
-        $sql="select id, nome, email, senha from tb_users";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $sql = new DataBase();
+        $result = $sql->select("select id, nome, email, senha from tb_users");
 
         if(!$result){
             $status = array(
@@ -189,38 +173,47 @@ class Usuario
             ":id" => $id
         ));
         
-        if(!$result){
+        if($result == NULL){
             $status = array(
                 'status' => 0,
-                'Menssagem' => "Erro - Dados não encontrados.",
-                'stmt errorinfo' => $stmt->errorInfo()
+                'Menssagem' => "Erro - Dados não encontrados."
             );
+
             $result = json_encode($status, true);
 
-            return $result;
-        }
+        } else {
+            $this->__set("id", $result[0]['id']);
+            $this->__set("nome", $result[0]['nome']);
+            $this->__set("email", $result[0]['email']);
+            $this->__set("senha", $result[0]['senha']);
 
-        $this->__set("id", $result[0]['id']);
-        $this->__set("nome", $result[0]['nome']);
-        $this->__set("email", $result[0]['email']);
-        $this->__set("senha", $result[0]['senha']);
+            $status = array(
+                'status' => 1,
+                'message' => "Dados encontrados com sucesso.",
+                'id' => $this->__get("id"),
+                'nome' => $this->__get("nome"),
+                'email' => $this->__get("email"),
+                'senha' => $this->__get("senha")
+            );
 
-        $status = array(
-            'status' => 1,
-            'message' => "Dados encontrados com sucesso.",
-            'id' => $this->__get("id"),
-            'nome' => $this->__get("nome"),
-            'email' => $this->__get("email"),
-            'senha' => $this->__get("senha")
-        );
-
-        $result = json_encode($status, true);
+            $result = json_encode($status, true);
+        }   
 
         return $result;
 
     }
 
-    public function __toString(){
+    public function __toString()
+    {
+
+        if($this->__get("id") == null){
+            return json_encode(array(
+                'status' => 0,
+                'Menssagem' => "Erro - Dados não encontrados."
+            ));
+
+        }
+
         return json_encode(array(
             "id" => $this->__get("id"),
             "nome" => $this->__get("nome"),
