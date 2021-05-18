@@ -3,8 +3,8 @@
 class DataBase extends PDO
 {
     private $host = "localhost";
-    private $port = 3307;
-    private $db = "db_pdo";
+    private $port = 3306;
+    private $db = "php-pdo";
     private $user = "root";
     private $password = "";
     private $conn;
@@ -37,26 +37,10 @@ class DataBase extends PDO
         $this->$attr = $val;
     }
 
-     //criar tabela
-    public function create($entidade, $campos = array()){
-        $camposLength = count($campos);
-        
-        $sql="CREATE TABLE IF NOT EXISTS $entidade(";
-        for($i = 0; $i < $camposLength; $i++){
-            $sql .= $campos[$i] . ", ";
-        }
-        $sql = substr($sql, 0, -2);
-        $sql .= ");";
-
-        $result =  $this->conn->exec($sql);
-        return $result;
-
-    }
-
     private function setParams($statement, $parameters = array()){
 
         foreach ($parameters as $key => $value) {
-            $this->setParam($key, $value);
+            $this->setParam($statement, $key, $value);
 
         }
 

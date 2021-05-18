@@ -1,11 +1,10 @@
 <?php
     require_once ("autoload.php");
 
-    $db = New DataBase();
+    $usuario = new Usuario();
 
-    $usuarios = $db->select("SELECT * FROM tb_users");
+    $usuario->visualizar(10);
 
-    echo json_encode($usuarios);    
-   
-    
+    echo $usuario;
+
 ?>

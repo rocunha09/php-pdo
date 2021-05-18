@@ -8,13 +8,6 @@ class Usuario
     private $nome;
     private $email;
     private $senha;
-    private $db;
-
-
-    public function __construct($db)
-    {
-        $this->db = $db;
-    }
 
     public function __get($attr)
     {
@@ -188,14 +181,13 @@ class Usuario
 
     }
 
-    public function visualizar()
+    public function visualizar($id)
     {
-        $sql="select id, nome, email, senha from tb_users where id = :id";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(":id", $this->__get("id"));
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $sql = new DataBase();
+        $result = $sql->select("select id, nome, email, senha from tb_users where id = :id", 
+        array(
+            ":id" => $id
+        ));
         
         if(!$result){
             $status = array(
@@ -206,16 +198,20 @@ class Usuario
             $result = json_encode($status, true);
 
             return $result;
-
         }
+
+        $this->__set("id", $result[0]['id']);
+        $this->__set("nome", $result[0]['nome']);
+        $this->__set("email", $result[0]['email']);
+        $this->__set("senha", $result[0]['senha']);
 
         $status = array(
             'status' => 1,
             'message' => "Dados encontrados com sucesso.",
-            'id' => $result['id'],
-            'nome' => $result['nome'],
-            'email' => $result['email'],
-            'senha' => $result['senha']
+            'id' => $this->__get("id"),
+            'nome' => $this->__get("nome"),
+            'email' => $this->__get("email"),
+            'senha' => $this->__get("senha")
         );
 
         $result = json_encode($status, true);
@@ -224,6 +220,14 @@ class Usuario
 
     }
 
+    public function __toString(){
+        return json_encode(array(
+            "id" => $this->__get("id"),
+            "nome" => $this->__get("nome"),
+            "email" => $this->__get("email"),
+            "senha" => $this->__get("senha")
+        ));
+    }
 
 }
 
